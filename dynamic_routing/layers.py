@@ -60,5 +60,7 @@ class DigitCaps(torch.nn.Module, Capsule):
 
     def forward(self, inputs):
         inputs = torch.flatten(inputs, 1)
-        outputs = self.route(inputs)
+        outputs = self.transform(inputs)
+        outputs = outputs.view(-1, 1, self.out_features, 1, self.out_capsules)
+        outputs = self.route(outputs)
         return outputs.view(-1, self.out_features, self.out_capsules).norm(p=2, dim=-1)
