@@ -1,1 +1,1 @@
-# caps-net-project
+# Capsule Networks
