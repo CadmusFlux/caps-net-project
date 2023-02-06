@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 
 
 class MarginLoss(torch.nn.Module):
