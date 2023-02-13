@@ -21,7 +21,7 @@ class SquashDR(Squash):
         super().__init__(p, dim)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        norm = super()(inputs)
+        norm = super().forward(inputs)
         return inputs * norm / (1 + norm ** 2)
 
 
@@ -30,7 +30,7 @@ class SquashSA(Squash):
         super().__init__(p, dim)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        norm = super()(inputs)
+        norm = super().forward(inputs)
         return inputs / norm * (1 - 1 / norm.exp())
 
 
