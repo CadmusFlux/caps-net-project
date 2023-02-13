@@ -12,6 +12,7 @@ class Router(torch.nn.Module):
         super().__init__()
         self.bias = torch.nn.Parameter(torch.empty(num_capsules, num_features))
         self.activation = activation()
+        self.reset_parameters()
 
     def _args_str(self) -> str:
         args = ''
@@ -76,7 +77,7 @@ class SelfAttentionRouter(Router):
 if __name__ == '__main__':
     router1 = AgreementRouter(16, 10)
     router2 = SelfAttentionRouter(16, 10)
-    tensor = torch.rand(64, 32, 10, 16)
+    tensor = torch.rand(64, 1152, 10, 16)
     print(router1)
     print(router2)
     print(router1(tensor).size())
