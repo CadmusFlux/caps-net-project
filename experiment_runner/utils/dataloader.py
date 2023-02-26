@@ -7,8 +7,8 @@ import tensorflow as tf
 __all__ = ["DataLoader"]
 
 
-def default_collate(batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]]) -> Union[
-    Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]:
+def default_collate(batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]]) \
+        -> Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]:
     batch_size = len(batch)
     if batch_size <= 0:
         raise ValueError("Batch is empty!")
