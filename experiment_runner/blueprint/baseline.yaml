@@ -1,0 +1,62 @@
+model:
+	name: baseline
+	layer:
+		input:
+			layer_type: input
+			hparams:
+				shape: [32, 32, 3]
+		conv1:
+			layer_type: conv2d
+			hparams:
+				filters: 256
+				kernel_size: [5, 5]
+				strides: [1, 1]
+				activation: relu
+		conv2:
+			layer_type: conv2d
+			hparams:
+				filters: 256
+				kernel_size: [5, 5]
+				strides: [1, 1]
+				activation: relu
+		conv3:
+			layer_type: conv2d
+			hparams:
+				filters: 128
+				kernel_size: [5, 5]
+				strides: [1, 1]
+				activation: relu
+		flatten:
+			layer_type: flatten
+		fc1:
+			layer_type: dense
+			hparams:
+				units: 328
+				activation: relu
+		fc2:
+			layer_type: dense
+			hparams:
+				units: 192
+				activation: relu
+		dropout:
+			layer_type: dropout
+			hparams:
+				rate: 0.5
+		classifier:
+			layer_type: dense
+			hparams:
+				units: 10
+				activation: linear
+training_arguments:
+	epochs: 10
+	batch_size: 128
+	loss:
+		kind: sparse_cross_entropy
+		hparams:
+			from_logits: true
+	optimizer:
+		kind: adam
+		hparams:
+			learning_rate: 1e-3
+	metrics:
+		- accuracy

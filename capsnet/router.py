@@ -7,10 +7,10 @@ __all__ = ['AgreementRouter', 'SelfAttentionRouter']
 
 
 class Router(torch.nn.Module):
-    def __init__(self, num_features: int, num_capsules: int,
+    def __init__(self, num_features: int, in_capsules: int, out_capsules: int,
                  activation: Optional[torch.nn.Module] = torch.nn.Identity):
         super().__init__()
-        self.bias = torch.nn.Parameter(torch.empty(num_capsules, num_features))
+        self.bias = torch.nn.Parameter(torch.empty(in_capsules, out_capsules, 1))
         self.activation = activation()
         self.reset_parameters()
 
@@ -33,9 +33,9 @@ class Router(torch.nn.Module):
 
 
 class AgreementRouter(Router):
-    def __init__(self, num_features: int, num_capsules: int, num_routing: Optional[int] = 3,
+    def __init__(self, num_features: int, in_capsules: int, out_capsules: int, num_routing: Optional[int] = 3,
                  activation: Optional[torch.nn.Module] = torch.nn.Identity):
-        super().__init__(num_features, num_capsules, activation)
+        super().__init__(num_features, in_capsules, out_capsules, activation)
         self.num_routing = num_routing if num_routing > 0 else 1
 
     def _args_str(self) -> str:
@@ -49,26 +49,27 @@ class AgreementRouter(Router):
         priors = torch.zeros_like(inputs)
 
         for i in range(self.num_routing):
-            agreements = torch.softmax(priors, dim=-2)
+            agreements = torch.softmax(priors, dim=2)
             outputs = (inputs * agreements).sum(dim=1, keepdim=True)
             outputs = outputs + self.bias
             outputs = self.activation(outputs)
             if i < self.num_routing - 1:
                 priors = priors + (inputs * outputs).sum(dim=-1, keepdim=True)
-        return outputs.squeeze(dim=1)
+        return outputs[:, 0]
 
 
 class SelfAttentionRouter(Router):
-    def __init__(self, num_features: int, num_capsules: int, activation: Optional[torch.nn.Module] = torch.nn.Identity):
-        super().__init__(num_features, num_capsules, activation)
-        self.pattern = '... i j, ... k j -> ... i'
+    def __init__(self, num_features: int, in_capsules: int, out_capsules: int,
+                 activation: Optional[torch.nn.Module] = torch.nn.Identity):
+        super().__init__(num_features, in_capsules, out_capsules, activation)
+        self.pattern = '... i j d, ... i j d -> ... i j'
         self.num_features = num_features
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         outputs = einsum(inputs, inputs, self.pattern)
-        outputs = outputs.unsqueeze(-1)
+        outputs = outputs[..., None]
         outputs = outputs / self.num_features ** 0.5
-        outputs = torch.softmax(outputs, dim=-2)
+        outputs = torch.softmax(outputs, dim=2)
         outputs = outputs + self.bias
         outputs = (inputs * outputs).sum(dim=1)
         return self.activation(outputs)

@@ -1,7 +1,6 @@
-from typing import Optional
-
 import torch
 import torch.nn.functional as F
+from typing import Optional
 
 from .helper import reduce
 
@@ -18,7 +17,7 @@ class MarginLoss(torch.nn.Module):
         targets = F.one_hot(targets, outputs.size(-1))
 
         loss_pos = targets * torch.relu(self.pos_weight - outputs) ** 2
-        loss_neg = (1 - targets) * torch.relu(outputs - self.pos_weight + 1) ** 2
+        loss_neg = (1 - targets) * torch.relu(outputs + self.pos_weight - 1) ** 2
 
         loss = (loss_pos + self.lambda_ * loss_neg).sum(-1)
 
