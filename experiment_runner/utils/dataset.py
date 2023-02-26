@@ -54,7 +54,7 @@ class ImageDataset:
             label = self.cls2idx[label]
 
         if self.transform is not None:
-            image = self.transform(image)["image"]
+            image = self.transform(image=image)["image"]
 
         label = one_hot(label, self.num_classes)
 
