@@ -1,4 +1,4 @@
-from typing import Optional, Literal, Union
+from typing import Optional, Literal, Union, Tuple
 
 import tensorflow as tf
 
@@ -25,7 +25,7 @@ class Squash(tf.keras.layers.Layer):
 
         return factor * inputs / (norm + self.eps)
 
-    def calculate_factor(self, inputs: tf.Tensor) -> tf.Tensor:
+    def calculate_factor(self, inputs: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
         norm = tf.norm(inputs, self.ord, axis=self.axis, keepdims=True)
         if self.squash == "dynamic_routing":
             return norm, norm ** 2 / (1 + norm ** 2)
