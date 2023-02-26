@@ -138,8 +138,9 @@ class CapsuleMask(tf.keras.layers.Layer):
 
     def call(self, inputs: tf.Tensor, mask: Optional[tf.Tensor]) -> tf.Tensor:
         if mask is None:
-            mask = tf.norm(inputs, axis=-1)
+            mask = tf.norm(tf.stop_gradient(inputs), axis=-1)
             mask = tf.argmax(mask, inputs.shape[1])
             mask = tf.one_hot(mask, inputs.shape[1])
+        mask = tf.cast(mask, inputs.dtype)
         mask = tf.expand_dims(mask, axis=-1)
         return inputs * mask
