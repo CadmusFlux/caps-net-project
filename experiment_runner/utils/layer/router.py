@@ -104,7 +104,7 @@ class SelfAttentionRouter(Router):
             trainable=self.use_bias,
             constraint=self.bias_constraint,
         )
-        self.pattern = "... n_out1 d_out, ... n_out2 d_out -> ... n_out1"
+        self.pattern = "... n_in1 n_out d_out, ... n_in2 n_out d_out -> ... n_in1 n_out"
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         vector_size = inputs.shape[-1]
