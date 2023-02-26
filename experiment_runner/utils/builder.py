@@ -4,7 +4,7 @@ import tensorflow as tf
 
 
 def generate_layer(
-    name: str, layer_type: str, hparams: Optional[Dict[str, Any]] = None
+        name: str, layer_type: str, hparams: Optional[Dict[str, Any]] = None
 ) -> tf.keras.layers.Layer:
     if layer_type == "input":
         return tf.keras.layers.Input(name=name, **hparams)
@@ -26,7 +26,7 @@ def generate_layer(
 
 
 def create_optimizer(
-    kwargs: Union[Dict[str, Any], str]
+        kwargs: Union[Dict[str, Any], str]
 ) -> Union[str, tf.keras.optimizers.Optimizer]:
     if isinstance(kwargs, str):
         return kwargs

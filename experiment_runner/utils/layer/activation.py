@@ -5,12 +5,12 @@ import tensorflow as tf
 
 class Squash(tf.keras.layers.Layer):
     def __init__(
-        self,
-        squash: Literal["dynamic_routing", "self_attention"],
-        ord: Optional[Union[int, str]] = "euclidean",
-        axis: Optional[int] = -1,
-        eps: Optional[float] = 1e-7,
-        **kwargs,
+            self,
+            squash: Literal["dynamic_routing", "self_attention"],
+            ord: Optional[Union[int, str]] = "euclidean",
+            axis: Optional[int] = -1,
+            eps: Optional[float] = 1e-7,
+            **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         if not squash in ["dynamic_routing", "self_attention"]:
@@ -28,5 +28,5 @@ class Squash(tf.keras.layers.Layer):
     def calculate_factor(self, inputs: tf.Tensor) -> tf.Tensor:
         norm = tf.norm(inputs, self.ord, axis=self.axis, keepdims=True)
         if self.squash == "dynamic_routing":
-            return norm, norm**2 / (1 + norm**2)
+            return norm, norm ** 2 / (1 + norm ** 2)
         return norm, 1 - tf.exp(-norm)

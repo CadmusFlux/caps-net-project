@@ -8,25 +8,25 @@ from .activation import Squash
 
 class PrimaryCapsule(tf.keras.layers.Layer):
     def __init__(
-        self,
-        capsules: int,
-        units: int,
-        kernel_size: Optional[Union[int, Tuple[int, int]]] = None,
-        strides: Optional[Union[int, Tuple[int, int]]] = (1, 1),
-        padding: Optional[str] = "valid",
-        data_format: Optional[str] = None,
-        dilation_rate: Optional[Union[int, Tuple[int, int]]] = (1, 1),
-        depthwise: Optional[bool] = False,
-        squash: Optional[str] = None,
-        use_bias: Optional[bool] = False,
-        kernel_initializer: Optional[str] = "glorot_uniform",
-        bias_initializer: Optional[str] = "zeros",
-        kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
-        bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
-        activity_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
-        kernel_constraint: Optional[tf.keras.constraints.Constraint] = None,
-        bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
-        **kwargs
+            self,
+            capsules: int,
+            units: int,
+            kernel_size: Optional[Union[int, Tuple[int, int]]] = None,
+            strides: Optional[Union[int, Tuple[int, int]]] = (1, 1),
+            padding: Optional[str] = "valid",
+            data_format: Optional[str] = None,
+            dilation_rate: Optional[Union[int, Tuple[int, int]]] = (1, 1),
+            depthwise: Optional[bool] = False,
+            squash: Optional[str] = None,
+            use_bias: Optional[bool] = False,
+            kernel_initializer: Optional[str] = "glorot_uniform",
+            bias_initializer: Optional[str] = "zeros",
+            kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
+            bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
+            activity_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
+            kernel_constraint: Optional[tf.keras.constraints.Constraint] = None,
+            bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
+            **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.capsules = capsules
@@ -85,13 +85,13 @@ class PrimaryCapsule(tf.keras.layers.Layer):
 
 class CapsuleTransform(tf.keras.layers.Layer):
     def __init__(
-        self,
-        capsules: int,
-        units: int,
-        kernel_initializer: Optional[str] = "glorot_uniform",
-        kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
-        kernel_constraint: Optional[tf.keras.constraints.Constraint] = None,
-        **kwargs
+            self,
+            capsules: int,
+            units: int,
+            kernel_initializer: Optional[str] = "glorot_uniform",
+            kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
+            kernel_constraint: Optional[tf.keras.constraints.Constraint] = None,
+            **kwargs
     ):
         super().__init__(**kwargs)
         self.capsules = capsules
@@ -119,10 +119,10 @@ class CapsuleTransform(tf.keras.layers.Layer):
 
 class CapsuleLength(tf.keras.layers.Layer):
     def __init__(
-        self,
-        ord: Optional[Union[str, int]] = "euclidean",
-        axis: Optional[int] = -1,
-        **kwargs
+            self,
+            ord: Optional[Union[str, int]] = "euclidean",
+            axis: Optional[int] = -1,
+            **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.ord = ord
@@ -139,7 +139,5 @@ class CapsuleMask(tf.keras.layers.Layer):
     def call(self, inputs: tf.Tensor, mask: Optional[tf.Tensor]) -> tf.Tensor:
         if mask is None:
             mask = tf.norm(inputs, axis=-1)
-            mask = tf.argmax(mask, axis=-1)
-        mask = tf.one_hot(mask, inputs.shape[1])
         mask = tf.expand_dims(mask, axis=-1)
         return inputs * mask

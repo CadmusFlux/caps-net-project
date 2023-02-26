@@ -1,21 +1,20 @@
 from typing import Optional
 
 import tensorflow as tf
+from einops import einsum
 
 from .activation import Squash
-
-from einops import einsum
 
 
 class Router(tf.keras.layers.Layer):
     def __init__(
-        self,
-        squash: Optional[str],
-        use_bias: Optional[bool] = True,
-        bias_initializer: Optional[str] = "zeros",
-        bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
-        bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
-        **kwargs
+            self,
+            squash: Optional[str],
+            use_bias: Optional[bool] = True,
+            bias_initializer: Optional[str] = "zeros",
+            bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
+            bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
+            **kwargs
     ) -> None:
         super().__init__(**kwargs)
         self.squash = Squash(squash) if squash is not None else tf.identity
@@ -43,14 +42,14 @@ class Router(tf.keras.layers.Layer):
 
 class DynamicRouter(Router):
     def __init__(
-        self,
-        num_routing: Optional[int] = 3,
-        squash: Optional[str] = "dynamic_routing",
-        use_bias: Optional[bool] = True,
-        bias_initializer: Optional[str] = "zeros",
-        bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
-        bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
-        **kwargs
+            self,
+            num_routing: Optional[int] = 3,
+            squash: Optional[str] = "dynamic_routing",
+            use_bias: Optional[bool] = True,
+            bias_initializer: Optional[str] = "zeros",
+            bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
+            bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
+            **kwargs
     ) -> None:
         super().__init__(
             squash,
@@ -78,13 +77,13 @@ class DynamicRouter(Router):
 
 class SelfAttentionRouter(Router):
     def __init__(
-        self,
-        squash: Optional[str] = "self_attention",
-        use_bias: Optional[bool] = True,
-        bias_initializer: Optional[str] = "zeros",
-        bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
-        bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
-        **kwargs
+            self,
+            squash: Optional[str] = "self_attention",
+            use_bias: Optional[bool] = True,
+            bias_initializer: Optional[str] = "zeros",
+            bias_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
+            bias_constraint: Optional[tf.keras.constraints.Constraint] = None,
+            **kwargs
     ) -> None:
         super().__init__(
             squash,
@@ -111,7 +110,7 @@ class SelfAttentionRouter(Router):
         vector_size = inputs.shape[-1]
         outputs = einsum(inputs, inputs, self.pattern)
         outputs = tf.expand_dims(outputs, axis=-1)
-        outputs = outputs / vector_size**0.5
+        outputs = outputs / vector_size ** 0.5
         outputs = tf.nn.softmax(outputs, axis=1)
         outputs = outputs + self.bias
         outputs = tf.reduce_sum(inputs * outputs, axis=1)

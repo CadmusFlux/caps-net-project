@@ -29,12 +29,12 @@ def default_collate(batch):
 
 class DataLoader(tf.keras.utils.Sequence):
     def __init__(
-        self,
-        dataset,
-        batch_size,
-        shuffle=False,
-        drop_last=False,
-        collate_fn=default_collate,
+            self,
+            dataset,
+            batch_size,
+            shuffle=False,
+            drop_last=False,
+            collate_fn=default_collate,
     ):
         self.dataset = dataset
         self.batch_size = batch_size
