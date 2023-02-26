@@ -13,7 +13,7 @@ class Squash(tf.keras.layers.Layer):
             **kwargs,
     ) -> None:
         super().__init__(**kwargs)
-        if not squash in ["dynamic_routing", "self_attention"]:
+        if squash not in ["dynamic_routing", "self_attention"]:
             raise ValueError(f"Squash function {squash} is not defined!")
         self.squash = squash
         self.axis = axis

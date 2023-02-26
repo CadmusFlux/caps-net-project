@@ -1,4 +1,5 @@
 from collections.abc import Iterable, Mapping
+from typing import Dict, Any, Union, Tuple, Callable, Optional, Sequence, List
 
 import numpy as np
 import tensorflow as tf
@@ -6,7 +7,8 @@ import tensorflow as tf
 __all__ = ["DataLoader"]
 
 
-def default_collate(batch):
+def default_collate(batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]]) -> Union[
+    Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]:
     batch_size = len(batch)
     if batch_size <= 0:
         raise ValueError("Batch is empty!")
@@ -30,12 +32,12 @@ def default_collate(batch):
 class DataLoader(tf.keras.utils.Sequence):
     def __init__(
             self,
-            dataset,
-            batch_size,
-            shuffle=False,
-            drop_last=False,
-            collate_fn=default_collate,
-    ):
+            dataset: Sequence,
+            batch_size: int,
+            shuffle: Optional[bool] = False,
+            drop_last: Optional[bool] = False,
+            collate_fn: Optional[Callable] = default_collate,
+    ) -> None:
         self.dataset = dataset
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -43,7 +45,7 @@ class DataLoader(tf.keras.utils.Sequence):
         self.collate_fn = collate_fn
         self.order = np.arange(len(self.dataset))
 
-    def __len__(self):
+    def __len__(self) -> int:
         num_samples = len(self.dataset)
         remainder = num_samples % self.batch_size
         total_batch = (num_samples - remainder) // self.batch_size
@@ -51,7 +53,7 @@ class DataLoader(tf.keras.utils.Sequence):
             total_batch += 1
         return total_batch
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]:
         if index >= len(self):
             raise IndexError("Index is out of range!")
 
@@ -66,6 +68,6 @@ class DataLoader(tf.keras.utils.Sequence):
 
         return self.collate_fn(batch)
 
-    def on_epoch_end(self):
+    def on_epoch_end(self) -> None:
         if self.shuffle:
             self.order = np.random.permutation(self.order)
