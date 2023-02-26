@@ -66,7 +66,7 @@ class DynamicRouter(Router):
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         priors = tf.zeros_like(inputs)
         for i in range(self.num_routing):
-            agreements = tf.nn.softmax(priors, axis=1)
+            agreements = tf.nn.softmax(priors, axis=2)
             outputs = tf.reduce_sum(inputs * agreements, axis=1, keepdims=True)
             outputs = super().call(outputs)
             if i < self.num_routing - 1:
@@ -106,12 +106,12 @@ class SelfAttentionRouter(Router):
         )
         self.pattern = "... n_out1 d_out, ... n_out2 d_out -> ... n_out1"
 
-    def call(self, inputs):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         vector_size = inputs.shape[-1]
         outputs = einsum(inputs, inputs, self.pattern)
         outputs = tf.expand_dims(outputs, axis=-1)
         outputs = outputs / vector_size ** 0.5
-        outputs = tf.nn.softmax(outputs, axis=1)
+        outputs = tf.nn.softmax(outputs, axis=2)
         outputs = outputs + self.bias
         outputs = tf.reduce_sum(inputs * outputs, axis=1)
         outputs = self.squash(outputs)
