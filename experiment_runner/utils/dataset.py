@@ -4,7 +4,7 @@ import os
 import pathlib
 from collections import Counter, defaultdict
 from copy import deepcopy
-from typing import List, Optional, Dict, Tuple, Union
+from typing import List, Optional, Dict, Tuple, Union, Sequence
 
 import albumentations as A
 import numpy as np
@@ -19,15 +19,33 @@ def one_hot(label: int, num_classes: int) -> np.ndarray:
     return label_one_hot
 
 
-def stratified_sampling(labels: Union[List[int], np.ndarray], sample_percentage: float) -> List[int]:
-    label_group = defaultdict(list)
+def stratified_sampling(
+        labels: Sequence, sample_size: Union[int, float]
+) -> List[int]:
+    if isinstance(sample_size, float) and 0 < sample_size > 1:
+        raise ValueError('sample_size must be between zero and one if float!')
+
+    indices = defaultdict(list)
     for i, label in enumerate(labels):
-        label_group[label].append(i)
+        indices[label].append(i)
+
+    counter = Counter(labels)
+
+    sample_percentage = sample_size
+    if isinstance(sample_size, int):
+        sample_percentage /= len(labels)
+
+    for label in counter:
+        counter[label] *= sample_percentage
+        counter[label] = int(np.ceil(counter[label]))
+
+    if isinstance(sample_size, int):
+        while sum(counter.values()) > sample_size:
+            counter[max(counter, key=counter.get)] -= 1
 
     sample = []
-    for label in label_group.values():
-        n = int(np.ceil(len(label) * sample_percentage))
-        sample.extend(np.random.choice(label, size=n, replace=False))
+    for label, index in indices.items():
+        sample.extend(np.random.choice(index, size=counter[label], replace=False))
     return sample
 
 
@@ -79,9 +97,9 @@ class ImageDataset:
             count = {c: n / len(self) for c, n in count.items()}
         return {c: count[c] for c in sorted(count)}
 
-    def sample(self, sample_percentage: float) -> ImageDataset:
+    def sample(self, sample_size: Union[int, float]) -> ImageDataset:
         dataset = deepcopy(self)
-        index = stratified_sampling(self.data["label"], sample_percentage)
+        index = stratified_sampling(self.data["label"], sample_size)
         for key, value in dataset.data.items():
             dataset.data[key] = value[index]
         return dataset
