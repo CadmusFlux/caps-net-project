@@ -34,7 +34,7 @@ class Router(tf.keras.layers.Layer):
             constraint=self.bias_constraint,
         )
 
-    def call(self, inputs):
+    def call(self, inputs: tf.Tensor) -> tf.Tensor:
         outputs = inputs + self.bias
         outputs = self.squash(outputs)
         return outputs

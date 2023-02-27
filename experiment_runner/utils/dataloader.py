@@ -1,5 +1,4 @@
-from collections.abc import Iterable, Mapping
-from typing import Dict, Any, Union, Tuple, Callable, Optional, Sequence, List
+from typing import Dict, Any, Union, Tuple, Callable, Optional, Sequence, List, Mapping
 
 import numpy as np
 import tensorflow as tf
@@ -8,7 +7,7 @@ __all__ = ["DataLoader"]
 
 
 def default_collate(batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]]) \
-        -> Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]:
+        -> Union[Mapping[Any, np.ndarray], Sequence[np.ndarray, ...], np.ndarray]:
     batch_size = len(batch)
     if batch_size <= 0:
         raise ValueError("Batch is empty!")
@@ -19,7 +18,7 @@ def default_collate(batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, .
             key: np.array([batch[i][key] for i in range(batch_size)]) for key in keys
         }
 
-    if isinstance(batch[0], Iterable):
+    if isinstance(batch[0], Sequence):
         value_count = len(batch[0])
         return tuple(
             np.array([batch[i][j] for i in range(batch_size)])

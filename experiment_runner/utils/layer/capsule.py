@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Literal
 
 import tensorflow as tf
 from einops import einsum, rearrange
@@ -17,7 +17,7 @@ class PrimaryCapsule(tf.keras.layers.Layer):
             data_format: Optional[str] = None,
             dilation_rate: Optional[Union[int, Tuple[int, int]]] = (1, 1),
             depthwise: Optional[bool] = False,
-            squash: Optional[str] = None,
+            squash: Optional[Literal["dynamic_routing", "self_attention"]] = None,
             use_bias: Optional[bool] = False,
             kernel_initializer: Optional[str] = "glorot_uniform",
             bias_initializer: Optional[str] = "zeros",
