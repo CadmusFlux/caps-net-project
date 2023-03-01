@@ -18,7 +18,7 @@ class PrimaryCapsule(tf.keras.layers.Layer):
             dilation_rate: Optional[Union[int, Tuple[int, int]]] = (1, 1),
             depthwise: Optional[bool] = False,
             squash: Optional[Literal["dynamic_routing", "self_attention"]] = None,
-            use_bias: Optional[bool] = False,
+            use_bias: Optional[bool] = True,
             kernel_initializer: Optional[str] = "glorot_uniform",
             bias_initializer: Optional[str] = "zeros",
             kernel_regularizer: Optional[tf.keras.regularizers.Regularizer] = None,
