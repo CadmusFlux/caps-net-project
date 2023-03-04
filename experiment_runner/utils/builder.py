@@ -43,18 +43,19 @@ def generate_layer(
 
 
 def create_optimizer(
-        kwargs: Union[Dict[str, Any], str]
+        lr,kwargs: Union[Dict[str, Any], str]
 ) -> Union[str, tf.keras.optimizers.Optimizer]:
     if isinstance(kwargs, str):
         return kwargs
 
-    kwargs["hparams"]["learning_rate"] = float(kwargs["hparams"]["learning_rate"])
+    #kwargs["hparams"]["learning_rate"] = float(kwargs["hparams"]["learning_rate"])
+    kwargs["hparams"]["weight_decay"] = float(kwargs["hparams"]["weight_decay"])
 
     if kwargs["kind"] == "sgd":
-        return tfa.optimizers.SGDW(**kwargs["hparams"])
+        return tfa.optimizers.SGDW(learning_rate = lr,momentum=0.9,**kwargs["hparams"])
 
     if kwargs["kind"] == "adam":
-        return tfa.optimizers.AdamW(**kwargs["hparams"])
+        return tfa.optimizers.AdamW(learning_rate = lr,**kwargs["hparams"])
 
 
 def create_loss_function(kwargs: Union[Dict[str, Any], str]) -> tf.keras.losses.Loss:

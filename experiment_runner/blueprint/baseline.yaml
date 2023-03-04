@@ -58,8 +58,5 @@ training_arguments:
     kind: adam
     hparams:
       weight_decay: 1e-5
-      learning_rate: tf.keras.optimizers.schedules.CosineDecayRestarts(
-            batch_size * 1e-3 / 16, len(trainloader) * 100)
-      momentum: 0.9
   metrics:
     - accuracy
