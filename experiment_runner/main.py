@@ -1,4 +1,5 @@
 import argparse
+import random
 
 import joblib
 import yaml
@@ -47,6 +48,13 @@ parser.add_argument(
     default=0,
 )
 
+parser.add_argument(
+    '--mixed-precision',
+    type=bool,
+    action='store_true',
+    default=False
+)
+
 
 def preprocess_image(image: tf.Tensor):
     return dict(image=image / 255.0)
@@ -57,6 +65,10 @@ if __name__ == "__main__":
 
     tf.random.set_seed(args.random_seed)
     np.random.seed(args.random_seed)
+    random.seed(args.random_seed)
+
+    if args.mixed_precision:
+        tf.keras.mixed_precision.set_global_policy('mixed_float16')
 
     with open(args.blueprint) as f:
         blueprint = yaml.safe_load(f)
