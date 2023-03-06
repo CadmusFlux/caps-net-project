@@ -96,7 +96,16 @@ if __name__ == "__main__":
 
             model.summary()
 
-            optimizer = create_optimizer(train_args["optimizer"])
+            trainset = CIFAR10(transform=preprocess_image)
+            validset = CIFAR10(train=False, transform=preprocess_image)
+
+            trainloader = DataLoader(trainset, train_args["batch_size"], True)
+            validloader = DataLoader(validset, train_args["batch_size"])
+
+            lr1 = tf.keras.optimizers.schedules.CosineDecayRestarts(
+                    train_args["batch_size"] * 1e-3 / 16, len(trainloader) * 100)
+
+            optimizer = create_optimizer(lr1,train_args["optimizer"])
             loss = create_loss_function(train_args["loss"])
             metrics = train_args["metrics"]
 
@@ -105,12 +114,6 @@ if __name__ == "__main__":
                 loss=loss,
                 metrics=metrics,
             )
-
-            trainset = CIFAR10(transform=preprocess_image)
-            validset = CIFAR10(train=False, transform=preprocess_image)
-
-            trainloader = DataLoader(trainset, train_args["batch_size"], True)
-            validloader = DataLoader(validset, train_args["batch_size"])
 
             history = model.fit(
                 trainloader,

@@ -1,6 +1,8 @@
 from typing import Any, Dict, Optional, Union
 
 import tensorflow as tf
+from utils.layer import *
+import tensorflow_addons as tfa
 
 
 def generate_layer(
@@ -23,21 +25,37 @@ def generate_layer(
 
     if layer_type == "flatten":
         return tf.keras.layers.Flatten(name=name)
+    
+    if layer_type == "primarycaps":
+        return PrimaryCapsule(name=name,**hparams)
+    
+    if layer_type == "CapsuleDR":
+        return CapsuleDR(name=name,**hparams)
+    
+    if layer_type == "CapsuleSA":
+        return CapsuleSA(name=name,**hparams)
+    
+    if layer_type == "CapsuleLength":
+        return CapsuleSA(name=name,**hparams)
+    
+    if layer_type == "CapsuleMask":
+        return CapsuleSA(name=name,**hparams)
 
 
 def create_optimizer(
-        kwargs: Union[Dict[str, Any], str]
+        lr,kwargs: Union[Dict[str, Any], str]
 ) -> Union[str, tf.keras.optimizers.Optimizer]:
     if isinstance(kwargs, str):
         return kwargs
 
-    kwargs["hparams"]["learning_rate"] = float(kwargs["hparams"]["learning_rate"])
+    #kwargs["hparams"]["learning_rate"] = float(kwargs["hparams"]["learning_rate"])
+    kwargs["hparams"]["weight_decay"] = float(kwargs["hparams"]["weight_decay"])
 
     if kwargs["kind"] == "sgd":
-        return tf.keras.optimizers.SGD(**kwargs["hparams"])
+        return tfa.optimizers.SGDW(learning_rate = lr,momentum=0.9,**kwargs["hparams"])
 
     if kwargs["kind"] == "adam":
-        return tf.keras.optimizers.Adam(**kwargs["hparams"])
+        return tfa.optimizers.AdamW(learning_rate = lr,**kwargs["hparams"])
 
 
 def create_loss_function(kwargs: Union[Dict[str, Any], str]) -> tf.keras.losses.Loss:
