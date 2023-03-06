@@ -1,5 +1,7 @@
+dataset: cifar10
 model:
   name: baseline
+  kind: standard
   layer:
     input:
       layer_type: input
@@ -46,17 +48,11 @@ model:
       layer_type: dense
       hparams:
         units: 10
-        activation: linear
 training_arguments:
   epochs: 10
   batch_size: 128
-  loss:
-    kind: cross_entropy
-    hparams:
-      from_logits: true
+  base_learning_rate: 1e-5
   optimizer:
     kind: adam
     hparams:
       weight_decay: 1e-5
-  metrics:
-    - accuracy
