@@ -2,11 +2,13 @@ from typing import Optional
 
 import tensorflow as tf
 
-__all__ = ['DenseBlock']
+__all__ = ["DenseBlock"]
 
 
 class DenseBlock(tf.keras.layers.Layer):
-    def __init__(self, filters: int, blocks: int, activation: Optional[str] = "relu", **kwargs):
+    def __init__(
+        self, filters: int, blocks: int, activation: Optional[str] = "relu", **kwargs
+    ):
         super().__init__(**kwargs)
         self.convs = [
             tf.keras.Sequential(

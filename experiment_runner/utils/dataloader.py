@@ -1,4 +1,5 @@
-from typing import Dict, Any, Union, Tuple, Callable, Optional, Sequence, List, Mapping
+from typing import (Any, Callable, Dict, List, Mapping, Optional, Sequence,
+                    Tuple, Union)
 
 import numpy as np
 import tensorflow as tf
@@ -6,8 +7,9 @@ import tensorflow as tf
 __all__ = ["DataLoader"]
 
 
-def default_collate(batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]]) \
-        -> Union[Mapping[Any, np.ndarray], Sequence[np.ndarray], np.ndarray]:
+def default_collate(
+    batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]]
+) -> Union[Mapping[Any, np.ndarray], Sequence[np.ndarray], np.ndarray]:
     batch_size = len(batch)
     if batch_size <= 0:
         raise ValueError("Batch is empty!")
@@ -30,12 +32,12 @@ def default_collate(batch: List[Union[Dict[Any, np.ndarray], Tuple[np.ndarray, .
 
 class DataLoader(tf.keras.utils.Sequence):
     def __init__(
-            self,
-            dataset: Sequence,
-            batch_size: int,
-            shuffle: Optional[bool] = False,
-            drop_last: Optional[bool] = False,
-            collate_fn: Optional[Callable] = default_collate,
+        self,
+        dataset: Sequence,
+        batch_size: int,
+        shuffle: Optional[bool] = False,
+        drop_last: Optional[bool] = False,
+        collate_fn: Optional[Callable] = default_collate,
     ) -> None:
         self.dataset = dataset
         self.batch_size = batch_size
@@ -52,7 +54,9 @@ class DataLoader(tf.keras.utils.Sequence):
             total_batch += 1
         return total_batch
 
-    def __getitem__(self, index: int) -> Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]:
+    def __getitem__(
+        self, index: int
+    ) -> Union[Dict[Any, np.ndarray], Tuple[np.ndarray, ...], np.ndarray]:
         if index >= len(self):
             raise IndexError("Index is out of range!")
 
