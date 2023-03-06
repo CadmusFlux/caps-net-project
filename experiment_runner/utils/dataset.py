@@ -4,11 +4,12 @@ import os
 import pathlib
 from collections import Counter, defaultdict
 from copy import deepcopy
-from typing import List, Optional, Dict, Tuple, Union, Sequence
+from typing import List, Optional, Dict, Tuple, Union, Sequence, Generator
 
 import albumentations as A
 import numpy as np
 from keras.datasets import cifar10, mnist
+from keras.utils import get_file
 
 from .image import load_image
 
@@ -20,14 +21,18 @@ def one_hot(label: int, num_classes: int) -> np.ndarray:
 
 
 def stratified_sampling(
-        labels: Sequence, sample_size: Union[int, float]
+        labels: Sequence, sample_size: Union[int, float], holdout: Optional[List[int]] = None
 ) -> List[int]:
     if isinstance(sample_size, float) and 0 < sample_size > 1:
         raise ValueError('sample_size must be between zero and one if float!')
 
     indices = defaultdict(list)
-    for i, label in enumerate(labels):
-        indices[label].append(i)
+    if holdout is not None:
+        for i in holdout:
+            indices[labels[i]].append(i)
+    else:
+        for i, label in enumerate(labels):
+            indices[label].append(i)
 
     counter = Counter(labels)
 
@@ -97,12 +102,25 @@ class ImageDataset:
             count = {c: n / len(self) for c, n in count.items()}
         return {c: count[c] for c in sorted(count)}
 
-    def sample(self, sample_size: Union[int, float]) -> ImageDataset:
-        dataset = deepcopy(self)
-        index = stratified_sampling(self.data["label"], sample_size)
-        for key, value in dataset.data.items():
-            dataset.data[key] = value[index]
-        return dataset
+    def sample(self, sample_size: Union[int, float], k: int, independent: Optional[bool] = False) \
+            -> Generator[ImageDataset]:
+        num_data = len(self)
+        if (isinstance(sample_size, float) and sample_size * num_data > num_data // k) \
+                or (isinstance(sample_size, int) and sample_size > num_data // k):
+            raise ValueError('Sample size is greater than total data per split!')
+
+        index_holdout = None
+        if independent:
+            index_holdout = list(range(num_data))
+
+        for _ in range(k):
+            dataset = deepcopy(self)
+            index = stratified_sampling(dataset.data["label"], sample_size, index_holdout)
+            for key, value in dataset.data.items():
+                dataset.data[key] = value[index]
+            if index_holdout is not None:
+                index_holdout = list(set(index_holdout) - set(index))
+            yield dataset
 
 
 class ImageFolder(ImageDataset):
@@ -119,12 +137,15 @@ class ImageFolder(ImageDataset):
 
 
 class MNIST(ImageDataset):
-    def __init__(self, train: Optional[bool] = True, transform: Optional[A.BasicTransform] = None) -> None:
-        self.train = train
+    def __init__(self, subset: str, transform: Optional[A.BasicTransform] = None) -> None:
+        self.subset = subset
+        self.image_size = (28, 28, 1)
         super().__init__(transform)
 
     def _build_dataset(self) -> None:
-        subset = 0 if self.train else 1
+        if self.subset.lower() not in ['train', 'valid']:
+            raise ValueError('Subset must be either train or valid!')
+        subset = 0 if self.subset == 'train' else 1
         self.data = defaultdict(list)
         image, label = mnist.load_data()[subset]
         self.data["image"] = np.expand_dims(image, axis=-1)
@@ -132,13 +153,24 @@ class MNIST(ImageDataset):
 
 
 class CIFAR10(ImageDataset):
-    def __init__(self, train: Optional[bool] = True, transform: Optional[A.BasicTransform] = None) -> None:
-        self.train = train
+    def __init__(self, subset: str, transform: Optional[A.BasicTransform] = None) -> None:
+        self.subset = subset
+        self.image_size = (32, 32, 3)
         super().__init__(transform)
 
     def _build_dataset(self) -> None:
-        subset = 0 if self.train else 1
+        if self.subset.lower() not in ['train', 'valid', 'test']:
+            raise ValueError('Subset must be either train, valid or test!')
+
         self.data = defaultdict(list)
-        image, label = cifar10.load_data()[subset]
+        if self.subset != 'test':
+            subset = 0 if self.subset == 'train' else 1
+            image, label = cifar10.load_data()[subset]
+        else:
+            image = np.load(get_file('cifar10.1_image.npy',
+                                     "https://github.com/modestyachts/CIFAR-10.1/raw/master/datasets/cifar10.1_v6_data.npy"))
+            label = np.load(get_file('cifar10.1_labels.npy',
+                                     "https://github.com/modestyachts/CIFAR-10.1/raw/master/datasets/cifar10.1_v6_labels.npy"))
+
         self.data["image"] = image
         self.data["label"] = label
