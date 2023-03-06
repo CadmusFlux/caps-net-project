@@ -5,6 +5,8 @@ from einops import einsum
 
 from .activation import Squash
 
+__all__ = ['Router', 'DynamicRouter', 'SelfAttentionRouter']
+
 
 class Router(tf.keras.layers.Layer):
     def __init__(
