@@ -2,6 +2,8 @@ from typing import Optional, Literal, Union, Tuple
 
 import tensorflow as tf
 
+__all__ = ['Squash']
+
 
 class Squash(tf.keras.layers.Layer):
     def __init__(
