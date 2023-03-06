@@ -111,8 +111,7 @@ class ImageDataset:
         holdout: Optional[bool] = False,
     ) -> Generator[ImageDataset]:
         num_data = len(self)
-
-        print(sample_size * num_data, num_data // k)
+        
         sampling_valid = (
             isinstance(sample_size, float) and num_data // k > sample_size * num_data
         )
@@ -120,14 +119,12 @@ class ImageDataset:
             isinstance(sample_size, int) and num_data // k > sample_size
         )
 
+        index_holdout = None
         if holdout:
             if not sampling_valid:
                 raise ValueError(
                     "Sample size is greater than total data per split for holdout split!"
                 )
-
-        index_holdout = None
-        if holdout:
             index_holdout = list(range(num_data))
 
         for _ in range(k):
