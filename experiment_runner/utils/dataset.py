@@ -119,10 +119,12 @@ class ImageDataset:
         sampling_valid = sampling_valid or (
             isinstance(sample_size, int) and num_data // k > sample_size
         )
-        if holdout and not sampling_valid:
-            raise ValueError(
-                "Sample size is greater than total data per split for holdout split!"
-            )
+
+        if holdout:
+            if not sampling_valid:
+                raise ValueError(
+                    "Sample size is greater than total data per split for holdout split!"
+                )
 
         index_holdout = None
         if holdout:
