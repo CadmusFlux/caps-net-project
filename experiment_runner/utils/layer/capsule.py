@@ -5,6 +5,8 @@ from einops import einsum, rearrange
 
 from .activation import Squash
 
+__all__ = ['PrimaryCapsule', 'CapsuleTransform', 'CapsuleLength', 'CapsuleMask']
+
 
 class PrimaryCapsule(tf.keras.layers.Layer):
     def __init__(
@@ -118,12 +120,7 @@ class CapsuleTransform(tf.keras.layers.Layer):
 
 
 class CapsuleLength(tf.keras.layers.Layer):
-    def __init__(
-            self,
-            ord: Optional[Union[str, int]] = "euclidean",
-            axis: Optional[int] = -1,
-            **kwargs
-    ) -> None:
+    def __init__(self, ord: Optional[Union[str, int]] = "euclidean", axis: Optional[int] = -1, **kwargs) -> None:
         super().__init__(**kwargs)
         self.ord = ord
         self.axis = axis
@@ -136,10 +133,10 @@ class CapsuleMask(tf.keras.layers.Layer):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
 
-    def call(self, inputs: tf.Tensor, mask: Optional[tf.Tensor]) -> tf.Tensor:
+    def call(self, inputs: tf.Tensor, mask: Optional[tf.Tensor] = None) -> tf.Tensor:
         if mask is None:
             mask = tf.norm(tf.stop_gradient(inputs), axis=-1)
-            mask = tf.argmax(mask, inputs.shape[1])
+            mask = tf.argmax(mask, axis=-1)
             mask = tf.one_hot(mask, inputs.shape[1])
         mask = tf.cast(mask, inputs.dtype)
         mask = tf.expand_dims(mask, axis=-1)
