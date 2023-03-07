@@ -23,6 +23,9 @@ def create_layer(
 
     if layer_type == "conv2d":
         return tf.keras.layers.Conv2D(name=name, **hparams)
+    
+    if layer_type == "inst_norm":
+        return tfa.layers.InstanceNormalization()
 
     if layer_type == "activation":
         return tf.keras.layers.Activation(name=name, **hparams)
@@ -43,7 +46,7 @@ def create_layer(
         return CapsuleSA(name=name, **hparams)
 
     if layer_type == "capsule_length":
-        return CapsuleSA(name=name, **hparams)
+        return CapsuleLength(name=name, **hparams)
 
     if layer_type == "capsule_mask":
         return CapsuleMask(name=name, **hparams)

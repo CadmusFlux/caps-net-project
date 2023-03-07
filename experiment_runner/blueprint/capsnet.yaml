@@ -1,0 +1,44 @@
+dataset: cifar10
+model:
+  name: efficient-net
+  kind: standard
+  layer:
+    input:
+      layer_type: input
+      hparams:
+        shape: [ 32, 32, 3 ]
+    conv1:
+      layer_type: conv2d
+      hparams:
+        filters: 256
+        kernel_size: [ 9, 9 ]
+        strides: [ 1, 1 ]
+        activation: relu
+        use_bias: False
+    Primary_capsule:
+      layer_type: primary_capsule
+      hparams:
+        capsules: 32
+        units: 8
+        kernel_size: 9
+        strides: 2
+        squash: "dynamic_routing"
+    Capsule_Direct_Routing:
+      layer_type: capsule_dr
+      hparams:
+        capsules: 10
+        units: 16
+    Capsule_length:
+      layer_type: capsule_length      
+    classifier:
+      layer_type: dense
+      hparams:
+        units: 10
+training_arguments:
+  epochs: 10
+  batch_size: 128
+  base_learning_rate: 1e-5
+  optimizer:
+    kind: adam
+    hparams:
+      weight_decay: 1e-5

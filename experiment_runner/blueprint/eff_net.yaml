@@ -1,0 +1,72 @@
+dataset: cifar10
+model:
+  name: efficient-net
+  kind: standard
+  layer:
+    input:
+      layer_type: input
+      hparams:
+        shape: [ 32, 32, 3 ]
+    conv1:
+      layer_type: conv2d
+      hparams:
+        filters: 32
+        kernel_size: [ 5, 5 ]
+        strides: [ 1, 1 ]
+        activation: relu
+        use_bias: False
+    Inst_norm1:
+      layer_type: inst_norm
+    conv2:
+      layer_type: conv2d
+      hparams:
+        filters: 64
+        kernel_size: [ 3, 3 ]
+        strides: [ 1, 1 ]
+        activation: relu
+    Inst_norm2:
+      layer_type: inst_norm
+    conv3:
+      layer_type: conv2d
+      hparams:
+        filters: 64
+        kernel_size: [ 3, 3 ]
+        strides: [ 1, 1 ]
+        activation: relu
+    Inst_norm3:
+      layer_type: inst_norm
+    conv4:
+      layer_type: conv2d
+      hparams:
+        filters: 128
+        kernel_size: [ 3, 3 ]
+        strides: [ 2, 2 ]
+        activation: relu
+    Inst_norm3:
+      layer_type: inst_norm
+    Primary_capsule:
+      layer_type: primary_capsule
+      hparams:
+        capsules: 64
+        units: 9
+        depthwise: True
+        squash: "self_attention"
+    Capsule_Self_Attention:
+      layer_type: capsule_sa
+      hparams:
+        capsules: 10
+        units: 16
+    Caps_length:
+      layer_type: capsule_length      
+    classifier:
+      layer_type: dense
+      hparams:
+        units: 10
+training_arguments:
+  epochs: 10
+  batch_size: 128
+  base_learning_rate: 1e-5
+  optimizer:
+    kind: adam
+    hparams:
+      weight_decay: 1e-5
