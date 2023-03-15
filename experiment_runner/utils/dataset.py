@@ -111,7 +111,7 @@ class ImageDataset:
         holdout: Optional[bool] = False,
     ) -> Generator[ImageDataset]:
         num_data = len(self)
-        
+
         sampling_valid = (
             isinstance(sample_size, float) and num_data // k > sample_size * num_data
         )

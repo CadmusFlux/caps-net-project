@@ -2,8 +2,9 @@ import argparse
 import random
 
 import yaml
-from keras_cv import models
+from wandb.keras import WandbMetricsLogger
 
+import wandb
 from utils.builder import *
 from utils.dataloader import *
 from utils.dataset import *
@@ -67,21 +68,20 @@ parser.add_argument(
 
 parser.add_argument(
     "--independent",
-    action="store_true",
+    action=argparse.BooleanOptionalAction,
     help="Use independent holdout sampling to have disjoint split per trial",
-    default=False,
 )
 
 parser.add_argument(
     "--mixed-precision",
-    action="store_true",
+    action=argparse.BooleanOptionalAction,
     help="Use mixed precision training",
-    default=False,
 )
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
+    os.environ["PYTHONHASHSEED"] = str(args.random_seed)
     tf.random.set_seed(args.random_seed)
     np.random.seed(args.random_seed)
     random.seed(args.random_seed)
@@ -100,13 +100,14 @@ if __name__ == "__main__":
         model_desc = blueprint["model"]
         train_args = blueprint["training_arguments"]
 
-        if "augmentation" not in train_args:
-            train_args["augmentation"] = None
-
         basepath = pathlib.Path(f"{args.export_folder}/{args.experiment_name}")
         savepath = basepath
 
         os.makedirs(basepath, exist_ok=True)
+
+        if 'augmentation' not in train_args:
+            train_args['augmentation'] = []
+        aug_tag = ' '.join(train_args['augmentation'])
 
         transform_train = create_transform(dataset, train_args["augmentation"])
         transform_eval = create_transform(dataset)
@@ -120,74 +121,24 @@ if __name__ == "__main__":
 
         dataset = dataset.sample(sample_size, args.num_trials, args.independent)
 
+        project_name = args.experiment_name
         for i, dataset_train in enumerate(dataset, 1):
             tf.keras.backend.clear_session()
             print(f"Trial {i}/{args.num_trials}")
             if args.num_trials > 1:
                 savepath = pathlib.Path(basepath.joinpath(f"trial-{i}"))
                 os.makedirs(savepath, exist_ok=True)
+                project_name = f'{args.experiment_name}-trial-{i}'
 
-            model = tf.keras.Sequential(name=model_desc["name"])
+            tags = [model_desc['name'], model_desc['kind']]
 
-            if model_desc["kind"] in ["standard", "capsule_network"]:
-                pretrained_args = dict(
-                    include_rescaling=False,
-                    include_top=True,
-                    input_shape=dataset_valid.image_size,
-                    classes=dataset_valid.num_classes,
-                    classifier_activation="linear",
-                )
-                if model_desc["name"] == "resnet18":
-                    backbone = models.resnet_v2.ResNet18V2(**pretrained_args)
-                elif model_desc["name"] == "resnet34":
-                    backbone = models.resnet_v2.ResNet34V2(**pretrained_args)
-                elif model_desc["name"] == "resnet50":
-                    backbone = models.resnet_v2.ResNet50V2(**pretrained_args)
-                elif model_desc["name"] == "densenet121":
-                    backbone = models.densenet.DenseNet121(**pretrained_args)
-                elif model_desc["name"] == "densenet169":
-                    backbone = models.densenet.DenseNet169(**pretrained_args)
-                elif model_desc["name"] == "vit-tiny":
-                    backbone = models.vit.ViTTiny16(**pretrained_args)
-                elif model_desc["name"] == "vit-small":
-                    backbone = models.vit.ViTS16(**pretrained_args)
-                elif model_desc["name"] == "vit-base":
-                    backbone = models.vit.ViTB16(**pretrained_args)
-                else:
-                    backbone = tf.keras.Sequential(name=model_desc["name"])
-                    for name, options in model_desc["layer"].items():
-                        if "hparams" not in options:
-                            options["hparams"] = {}
-                        backbone.add(
-                            create_layer(
-                                name, options["layer_type"], options["hparams"]
-                            )
-                        )
+            if len(aug_tag) > 0:
+                tags.append(aug_tag)
 
-                if model_desc["kind"] == "standard":
-                    model = StandardModel(backbone)
-                else:
-                    model = CapsNet(backbone)
+            wandb.init(project='mlp-cw', name=project_name, config=blueprint, job_type='training',
+                       tags=tags, reinit=True)
 
-            else:
-                encoder = tf.keras.Sequential(name=model_desc["encoder"]["name"])
-                decoder = tf.keras.Sequential(name=model_desc["decoder"]["name"])
-
-                for name, options in model_desc["encoder"]["layer"].items():
-                    if "hparams" not in options:
-                        options["hparams"] = {}
-                    encoder.add(
-                        create_layer(name, options["layer_type"], options["hparams"])
-                    )
-
-                for name, options in model_desc["decoder"]["layer"].items():
-                    if "hparams" not in options:
-                        options["hparams"] = {}
-                    decoder.add(
-                        create_layer(name, options["layer_type"], options["hparams"])
-                    )
-
-                model = CapsNetWithDecoder(encoder, decoder)
+            model = create_model(model_desc, dataset_valid.image_size, dataset_valid.num_classes)
 
             trainloader = DataLoader(dataset_train, train_args["batch_size"], True)
             validloader = DataLoader(dataset_valid, train_args["batch_size"])
@@ -215,5 +166,6 @@ if __name__ == "__main__":
                     ),
                     tf.keras.callbacks.TerminateOnNaN(),
                     tf.keras.callbacks.CSVLogger(savepath.joinpath("train.csv")),
+                    WandbMetricsLogger()
                 ],
             )
