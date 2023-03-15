@@ -1,0 +1,17 @@
+dataset: cifar10
+model:
+  name: vit-tiny
+  kind: standard
+training_arguments:
+  epochs: 500
+  batch_size: 128
+  base_learning_rate: 5e-4
+  optimizer:
+    kind: adam
+    hparams:
+      weight_decay: 1e-5
+  augmentation:
+    - random_crop
+    - color_jitter
+    - horizontal_flip
+    - cutout

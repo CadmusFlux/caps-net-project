@@ -3,10 +3,6 @@ model:
   name: baseline
   kind: standard
   layer:
-    input:
-      layer_type: input
-      hparams:
-        shape: [ 32, 32, 3 ]
     conv1:
       layer_type: conv2d
       hparams:
@@ -49,10 +45,15 @@ model:
       hparams:
         units: 10
 training_arguments:
-  epochs: 10
+  epochs: 50
   batch_size: 128
-  base_learning_rate: 1e-5
+  base_learning_rate: 5e-4
   optimizer:
     kind: adam
     hparams:
       weight_decay: 1e-5
+  augmentation:
+    - random_crop
+    - color_jitter
+    - horizontal_flip
+    - cutout

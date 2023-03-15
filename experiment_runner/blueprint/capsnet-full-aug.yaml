@@ -1,44 +1,38 @@
 dataset: cifar10
 model:
-  name: efficient-net
-  kind: standard
+  name: capsnet
+  kind: capsule_network
   layer:
-    input:
-      layer_type: input
-      hparams:
-        shape: [ 32, 32, 3 ]
-    conv1:
+    conv:
       layer_type: conv2d
       hparams:
         filters: 256
         kernel_size: [ 9, 9 ]
         strides: [ 1, 1 ]
         activation: relu
-        use_bias: False
-    Primary_capsule:
+    primary_caps:
       layer_type: primary_capsule
       hparams:
         capsules: 32
         units: 8
         kernel_size: 9
         strides: 2
-        squash: "dynamic_routing"
-    Capsule_Direct_Routing:
+        squash: dynamic_routing
+    dynamic_routed_caps:
       layer_type: capsule_dr
       hparams:
         capsules: 10
         units: 16
-    Capsule_length:
-      layer_type: capsule_length      
-    classifier:
-      layer_type: dense
-      hparams:
-        units: 10
 training_arguments:
-  epochs: 10
+  epochs: 500
   batch_size: 128
-  base_learning_rate: 1e-5
+  base_learning_rate: 5e-4
   optimizer:
     kind: adam
     hparams:
       weight_decay: 1e-5
+  augmentation:
+    - random_crop
+    - color_jitter
+    - horizontal_flip
+    - cutout
