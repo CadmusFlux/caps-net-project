@@ -1,0 +1,86 @@
+dataset: cifar10
+model:
+  name: efficient-capsnet
+  kind: capsule_network
+  layer:
+    conv1:
+      layer_type: conv2d
+      hparams:
+        filters: 32
+        kernel_size:
+        - 5
+        - 5
+        use_bias: false
+    batch_norm1:
+      layer_type: batch_norm
+    relu1:
+      layer_type: activation
+      hparams:
+        activation: relu
+    conv2:
+      layer_type: conv2d
+      hparams:
+        filters: 64
+        kernel_size:
+        - 3
+        - 3
+        use_bias: false
+    batch_norm2:
+      layer_type: batch_norm
+    relu2:
+      layer_type: activation
+      hparams:
+        activation: relu
+    conv3:
+      layer_type: conv2d
+      hparams:
+        filters: 64
+        kernel_size:
+        - 3
+        - 3
+        use_bias: false
+    batch_norm3:
+      layer_type: batch_norm
+    relu3:
+      layer_type: activation
+      hparams:
+        activation: relu
+    conv4:
+      layer_type: conv2d
+      hparams:
+        filters: 128
+        kernel_size:
+        - 3
+        - 3
+        strides:
+        - 2
+        - 2
+        use_bias: false
+    batch_norm4:
+      layer_type: batch_norm
+    relu4:
+      layer_type: activation
+      hparams:
+        activation: relu
+    primary_caps:
+      layer_type: primary_capsule
+      hparams:
+        capsules: 16
+        units: 8
+        depthwise: true
+        squash: self_attention
+    self_attention_caps:
+      layer_type: capsule_sa
+      hparams:
+        capsules: 10
+        units: 16
+training_arguments:
+  epochs: 500
+  batch_size: 128
+  base_learning_rate: 1e-4
+  optimizer:
+    kind: adam
+    hparams:
+      weight_decay: 1e-7
+  augmentation:
+  - random_crop
