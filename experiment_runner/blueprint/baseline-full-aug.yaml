@@ -47,7 +47,7 @@ model:
 training_arguments:
   epochs: 250
   batch_size: 128
-  base_learning_rate: 1e-4
+  base_learning_rate: 1e-5
   optimizer:
     kind: adam
     hparams:
