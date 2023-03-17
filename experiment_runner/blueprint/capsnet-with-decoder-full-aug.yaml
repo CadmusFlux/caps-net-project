@@ -1,0 +1,67 @@
+dataset: cifar10
+model:
+  name: dynamic-routed-capsnet-with-decoder
+  kind: capsule_network_with_decoder
+  encoder:
+    name: dynamic-routed-capsnet
+    layer:
+      conv:
+        layer_type: conv2d
+        hparams:
+          filters: 256
+          kernel_size: [ 9, 9 ]
+          strides: [ 1, 1 ]
+          activation: relu
+      primary_caps:
+        layer_type: primary_capsule
+        hparams:
+          capsules: 32
+          units: 8
+          kernel_size: 9
+          strides: 2
+          squash: dynamic_routing
+      dynamic_routed_caps:
+        layer_type: capsule_dr
+        hparams:
+          capsules: 10
+          units: 16
+  decoder:
+    name: fc-decoder
+    layer:
+      mask:
+        layer_type: capsule_mask
+      flatten:
+        layer_type: flatten
+      fc1:
+        layer_type: dense
+        hparams:
+          units: 512
+      relu1:
+        layer_type: activation
+        hparams:
+          activation: relu
+      fc2:
+        layer_type: dense
+        hparams:
+          units: 1024
+      relu2:
+        layer_type: activation
+        hparams:
+          activation: relu
+      fc3:
+        layer_type: dense
+        hparams:
+          units: 3072
+training_arguments:
+  epochs: 500
+  batch_size: 128
+  base_learning_rate: 1e-4
+  optimizer:
+    kind: adam
+    hparams:
+      weight_decay: 1e-7
+  augmentation:
+    - random_crop
+    - color_jitter
+    - horizontal_flip
+    - cutout

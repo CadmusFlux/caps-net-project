@@ -1,6 +1,6 @@
 dataset: cifar10
 model:
-  name: capsnet
+  name: dynamic-routed-capsnet
   kind: capsule_network
   layer:
     conv:

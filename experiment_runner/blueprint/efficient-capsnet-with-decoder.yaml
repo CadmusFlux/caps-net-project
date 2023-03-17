@@ -101,3 +101,8 @@ training_arguments:
     kind: adam
     hparams:
       weight_decay: 1e-7
+  augmentation:
+    - random_crop
+    - color_jitter
+    - horizontal_flip
+    - cutout
