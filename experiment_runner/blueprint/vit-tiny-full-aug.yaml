@@ -3,7 +3,7 @@ model:
   name: vit-tiny
   kind: standard
 training_arguments:
-  epochs: 500
+  epochs: 250
   batch_size: 128
   base_learning_rate: 1e-4
   optimizer:
