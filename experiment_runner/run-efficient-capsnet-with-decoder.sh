@@ -26,4 +26,4 @@ python main.py \
   --num-trial 5 \
   --mixed-precision \
   --sample-percentage 0.01 \
-  --independent
+  --independentcd

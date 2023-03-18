@@ -6,6 +6,5 @@ do
     python main.py \
         --blueprint blueprint-ablation/"$blueprint" \
         --experiment-name $experiment_name \
-        --num-trial 5 \
-        --mixed-precision
+        --num-trial 5
 done
