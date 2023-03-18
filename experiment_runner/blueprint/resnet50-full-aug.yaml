@@ -1,6 +1,6 @@
 dataset: cifar10
 model:
-  name: resnet18
+  name: resnet50
   kind: standard
 training_arguments:
   epochs: 250
