@@ -1,4 +1,4 @@
-spython main.py \
+python main.py \
     --blueprint blueprint/capsnet-with-decoder-full-aug.yaml \
     --experiment-name capsnet-with-decoder-full-aug-full-sample \
     --num-trial 5
