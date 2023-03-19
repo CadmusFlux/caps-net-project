@@ -19,7 +19,7 @@ python main.py \
 
 python main.py \
   --blueprint blueprint/efficient-capsnet-full-aug.yaml \
-  --experiment-name baseline-full-aug-one-percent-sample \
+  --experiment-name efficient-capsnet-with-decoder-full-aug-one-percent-sample \
   --num-trial 5 \
   --sample-percentage 0.01 \
   --independent

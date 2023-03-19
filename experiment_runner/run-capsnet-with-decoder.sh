@@ -1,4 +1,4 @@
-python main.py \
+spython main.py \
     --blueprint blueprint/capsnet-with-decoder-full-aug.yaml \
     --experiment-name capsnet-with-decoder-full-aug-full-sample \
     --num-trial 5
@@ -19,7 +19,7 @@ python main.py \
 
 python main.py \
   --blueprint blueprint/capsnet-with-decoder-full-aug.yaml \
-  --experiment-name baseline-full-aug-one-percent-sample \
+  --experiment-name capsnet-with-decoder-full-aug-one-percent-sample \
   --num-trial 5 \
   --sample-percentage 0.01 \
   --independent
