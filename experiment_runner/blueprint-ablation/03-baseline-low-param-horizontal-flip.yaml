@@ -1,0 +1,101 @@
+dataset: cifar10
+model:
+  name: baseline
+  kind: standard
+  layer:
+    conv1:
+      layer_type: conv2d
+      hparams:
+        filters: 32
+        kernel_size: [ 5, 5 ]
+        strides: [ 1, 1 ]
+        use_bias: false
+    batch_norm1:
+      layer_type: batch_norm
+    relu1:
+      layer_type: activation
+      hparams:
+        activation: relu
+    conv2:
+      layer_type: conv2d
+      hparams:
+        filters: 64
+        kernel_size: [ 3, 3 ]
+        strides: [ 1, 1 ]
+        use_bias: false
+    batch_norm2:
+      layer_type: batch_norm
+    relu2:
+      layer_type: activation
+      hparams:
+        activation: relu
+    conv3:
+      layer_type: conv2d
+      hparams:
+        filters: 32
+        kernel_size: [ 3, 3 ]
+        strides: [ 1, 1 ]
+        use_bias: false
+    batch_norm3:
+      layer_type: batch_norm
+    relu3:
+      layer_type: activation
+      hparams:
+        activation: relu
+    conv4:
+      layer_type: conv2d
+      hparams:
+        filters: 128
+        kernel_size: [ 3, 3 ]
+        strides: [ 2, 2 ]
+        use_bias: false
+    batch_norm4:
+      layer_type: batch_norm
+    relu4:
+      layer_type: activation
+      hparams:
+        activation: relu
+    conv5:
+      layer_type: conv2d
+      hparams:
+        filters: 128
+        kernel_size: [ 11, 11 ]
+        strides: [ 1, 1 ]
+        groups: 128
+        use_bias: false
+    batch_norm5:
+      layer_type: batch_norm
+    relu5:
+      layer_type: activation
+      hparams:
+        activation: relu
+    flatten:
+      layer_type: flatten
+    fc1:
+      layer_type: dense
+      hparams:
+        units: 328
+        activation: relu
+    fc2:
+      layer_type: dense
+      hparams:
+        units: 192
+        activation: relu
+    dropout:
+      layer_type: dropout
+      hparams:
+        rate: 0.5
+    classifier:
+      layer_type: dense
+      hparams:
+        units: 10
+training_arguments:
+  epochs: 250
+  batch_size: 128
+  base_learning_rate: 1e-4
+  optimizer:
+    kind: adam
+    hparams:
+      weight_decay: 1e-7
+  augmentation:
+  - horizontal_flip
