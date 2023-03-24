@@ -1,0 +1,6 @@
+tensorflow-addons
+einops
+keras-cv
+wandb
+albumentations
+tensorflow
