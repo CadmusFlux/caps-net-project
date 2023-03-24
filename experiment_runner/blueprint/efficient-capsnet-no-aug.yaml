@@ -1,14 +1,13 @@
 dataset: cifar10
 model:
-  name: baseline
-  kind: standard
+  name: efficient-capsnet
+  kind: capsule_network
   layer:
     conv1:
       layer_type: conv2d
       hparams:
         filters: 32
         kernel_size: [ 5, 5 ]
-        strides: [ 1, 1 ]
         use_bias: false
     batch_norm1:
       layer_type: batch_norm
@@ -21,7 +20,6 @@ model:
       hparams:
         filters: 64
         kernel_size: [ 3, 3 ]
-        strides: [ 1, 1 ]
         use_bias: false
     batch_norm2:
       layer_type: batch_norm
@@ -32,9 +30,8 @@ model:
     conv3:
       layer_type: conv2d
       hparams:
-        filters: 32
+        filters: 64
         kernel_size: [ 3, 3 ]
-        strides: [ 1, 1 ]
         use_bias: false
     batch_norm3:
       layer_type: batch_norm
@@ -55,40 +52,18 @@ model:
       layer_type: activation
       hparams:
         activation: relu
-    conv5:
-      layer_type: conv2d
+    primary_caps:
+      layer_type: primary_capsule
       hparams:
-        filters: 128
-        kernel_size: [ 11, 11 ]
-        strides: [ 1, 1 ]
-        groups: 128
-        use_bias: false
-    batch_norm5:
-      layer_type: batch_norm
-    relu5:
-      layer_type: activation
+        capsules: 16
+        units: 8
+        depthwise: true
+        squash: self_attention
+    self_attention_caps:
+      layer_type: capsule_sa
       hparams:
-        activation: relu
-    flatten:
-      layer_type: flatten
-    fc1:
-      layer_type: dense
-      hparams:
-        units: 328
-        activation: relu
-    fc2:
-      layer_type: dense
-      hparams:
-        units: 192
-        activation: relu
-    dropout:
-      layer_type: dropout
-      hparams:
-        rate: 0.5
-    classifier:
-      layer_type: dense
-      hparams:
-        units: 10
+        capsules: 10
+        units: 16
 training_arguments:
   epochs: 250
   batch_size: 128
@@ -97,8 +72,3 @@ training_arguments:
     kind: adam
     hparams:
       weight_decay: 1e-7
-  augmentation:
-    - random_crop
-    - color_jitter
-    - horizontal_flip
-    - cutout
